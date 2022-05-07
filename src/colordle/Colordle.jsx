@@ -24,6 +24,12 @@ const KEYCODE_ENTER = 13;
 const KEYCODE_BACKSPACE = 8;
 const KEYCODE_DELETE = 46;
 
+function arrayEquals(a, b) {
+    return Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((val, index) => val === b[index]);
+}
 function set_seed(s) {
     return function() {
         s = Math.sin(s) * 10000; return s - Math.floor(s);
@@ -49,7 +55,7 @@ class Colordle extends Component{
             ct[i] = carr;
         }
         this.state = {
-            color: this.generateHexColor(this.getSeed(1)),
+            // color: this.generateHexColor(this.getSeed(1)),
             value_table: vt,
             color_table: ct,
             row: 0,
@@ -63,10 +69,7 @@ class Colordle extends Component{
         return (
             <div className="colordle">
                 <div className="color-display" style={{backgroundColor: "#" + this.state.color, color:(this.getContrastColor(Number("0x"+this.state.color)))}}>Current Color: {this.counter}</div>
-                <div style={{display:'flex', justifyContent: 'center'}}>
-                    
-                    {/* <button onClick={()=> this.clearBoard()}>Clear</button> */}
-                </div>
+                <div className="feedback-box"></div>
                 <div className="guess-board">
                     {this.state.value_table.map((value,index) => (
                         <div className={'row-' + index} style={{display: "flex"}} key={index}>
@@ -83,8 +86,8 @@ class Colordle extends Component{
         );
     }
     componentDidMount(){
+        this.setState({color: this.generateHexColor(this.getSeed(1))});
         document.addEventListener('keydown', this.keyboardHandler.bind(this));
-        this.getSeed();
     }
     getSeed(offset){
         let date = new Date();
@@ -207,7 +210,18 @@ class Colordle extends Component{
         let state = {color_table: this.state.color_table};
         state.color_table[this.state.row] = feedback;
         state.row = this.state.row + 1;
-        if(state.row >= NUM_GUESSES) state.row = NUM_GUESSES;
+        if(state.row >= NUM_GUESSES){
+            state.row = NUM_GUESSES;
+            let message = ""
+            if(arrayEquals(feedback, Array(COLOR_LENGTH).fill(FEEDBACK.green))){
+                message += "Correct! The color was: " + this.state.color;
+            }
+            else{
+                message += "Incorrect! The color was: " + this.state.color;
+            }
+            let box = document.getElementsByClassName("feedback-box")[0]
+            if(box) box.innerHTML = message;
+        }
         state.index = 0;
         this.setState(state);
     }
@@ -224,6 +238,8 @@ class Colordle extends Component{
             vt[i] = varr;
             ct[i] = carr;
         }
+        let box = document.getElementsByClassName("feedback-box")[0];
+        if(box) box.innerHTML = '';
         this.setState({color_table:ct, value_table:vt, row:0, index:0});
     }
     getContrastColor(color){
