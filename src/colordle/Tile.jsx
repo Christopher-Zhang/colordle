@@ -28,7 +28,7 @@ class Tile extends Component{
         //     <p>{this.state.value}</p> 
         //     {/* <input value={this.state.value} type="text"></input> */}
         // </div>
-            <input style={css} className={this.props.className} value={this.state.value} type="text" readOnly={true}></input>
+            <input style={css} className={this.props.className} value={this.state.value} type="text"></input>
         );
     }
     componentDidUpdate(prevProps){
