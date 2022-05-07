@@ -203,20 +203,21 @@ class Colordle extends Component{
         this.setState({index: x-1});
     }
     submitGuess(){
-        let arr = this.state.value_table[this.state.row];
         let feedback = this.checkGuess(this.state.value_table[this.state.row]);
         if(!feedback) return;
         // update
         let state = {color_table: this.state.color_table};
         state.color_table[this.state.row] = feedback;
         state.row = this.state.row + 1;
+        let correct = arrayEquals(feedback, Array(COLOR_LENGTH).fill(FEEDBACK.green));
+        let message = "";
+        if(correct){
+            message = "Correct! The color was: " + this.state.color;
+            state.row = NUM_GUESSES;
+        }
         if(state.row >= NUM_GUESSES){
             state.row = NUM_GUESSES;
-            let message = ""
-            if(arrayEquals(feedback, Array(COLOR_LENGTH).fill(FEEDBACK.green))){
-                message += "Correct! The color was: " + this.state.color;
-            }
-            else{
+            if(!correct){
                 message += "Incorrect! The color was: " + this.state.color;
             }
             let box = document.getElementsByClassName("feedback-box")[0]
